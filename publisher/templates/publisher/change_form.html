@@ -1,35 +1,28 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_static admin_modify admin_urls %}
 {% load url from future %}
-{% block object-tools %}
-    {{ block.super }}
-	{% if change %}{% if not is_popup %}
-		<ul class="object-tools">
-			{% block object-tools-items %}
-				{% if has_publish_permission %}
-					{% if publish_btn_live %}
-						<li>
-							<a href="{{ publish_btn_live }}">Publish Draft</a>
-						</li>
-					{% endif %}
-					{% if unpublish_btn %}
-						<li>
-							<a href="{{ unpublish_btn }}">Unpublish</a>
-						</li>
-					{% endif %}
-					{% if revert_btn %}
-						<li>
-							<a href="{{ revert_btn }}">Revert to Published</a>
-						</li>
-					{% endif %}
-					{% if preview_draft_btn %}
-						<li>
-							<a href="{{ original.get_absolute_url }}?edit">Preview Draft</a>
-						</li>
-					{% endif %}
-				{% endif %}
-				{{ block.super }}
-			{% endblock %}
-		</ul>
-	{% endif %}{% endif %}
+{% block object-tools-items %}
+	{{ block.super }}
+	{% if has_publish_permission %}
+		{% if publish_btn_live %}
+			<li>
+				<a href="{{ publish_btn_live }}">{% trans 'Publish Draft' %}</a>
+			</li>
+		{% endif %}
+		{% if unpublish_btn %}
+			<li>
+				<a href="{{ unpublish_btn }}">{% trans 'Unpublish' %}</a>
+			</li>
+		{% endif %}
+		{% if revert_btn %}
+			<li>
+				<a href="{{ revert_btn }}">{% trans 'Revert to Published' %}</a>
+			</li>
+		{% endif %}
+		{% if preview_draft_btn %}
+			<li>
+				<a href="{{ original.get_absolute_url }}?edit">{% trans 'Preview Draft' %}</a>
+			</li>
+		{% endif %}
+	{% endif %}
 {% endblock %}
