@@ -15,7 +15,8 @@ class PublisherMiddleware(object):
 
     @staticmethod
     def process_response(request, response):
-        del PublisherMiddleware._draft_status[current_thread()]
+        if current_thread() in PublisherMiddleware._draft_status:
+            del PublisherMiddleware._draft_status[current_thread()]
         return response
 
     @staticmethod
