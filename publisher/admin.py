@@ -89,9 +89,9 @@ class PublisherAdmin(ModelAdmin):
     def __init__(self, model, admin_site):
         super(PublisherAdmin, self).__init__(model, admin_site)
         self.request = None
-        self.url_name_prefix = '%(app_label)s_%(module_name)s_' % {
+        self.url_name_prefix = '%(app_label)s_%(model_name)s_' % {
             'app_label': self.model._meta.app_label,
-            'module_name': self.model._meta.module_name,
+            'model_name': self.model._meta.model_name,
         }
 
         # Reverse URL strings used in multiple places..
@@ -153,7 +153,7 @@ class PublisherAdmin(ModelAdmin):
     publisher_publish.short_description = 'Published'
     publisher_publish.allow_tags = True
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         # hack! We need request.user to check user publish perms
         self.request = request
         qs = self.model.publisher_manager.drafts()
