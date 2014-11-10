@@ -13,6 +13,6 @@
 	{% endif %}
 
 	{% if is_published %}
-		<a href="{{ object.get_absolute_url }}?edit" title="{% trans 'View on page' %}" class="icon selector-add viewpage" id="view-page-{{object.id}}"><span>{% trans "View" %}</span></a>
+		<a href="{{ object.get_absolute_url }}?draft" title="{% trans 'View draft' %}" class="icon selector-add viewpage" id="view-page-{{object.id}}"><span>{% trans "View" %}</span></a>
 	{% endif %}
 </div>
