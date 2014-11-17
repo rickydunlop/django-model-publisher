@@ -202,11 +202,30 @@ class PublisherModelBase(models.Model):
 
     def clone_relations(self, src_obj, dst_obj):
         """
-        Since copying relations is so complex, leave this to the implementing class
+            Copies related objects and associates them with the destination object
+            Used when publishing as we need to be able to revert an entire group of
+            related objects and not just the parent
         """
-        pass
 
-
+        reverse_foreignkeys = src_obj._meta.get_all_related_objects()
+        for relation in reverse_foreignkeys:
+            if relation.field.rel.multiple:
+                relation_items = getattr(src_obj, relation.get_accessor_name(), None)
+                for item in relation_items.all():
+                    new_item = deepcopy(item)
+                    new_item.id = None
+                    setattr(new_item, relation.field.name, dst_obj)
+                    new_item.save()
+                    self.clone_relations(item, new_item)
+        reverse_m2ms = src_obj._meta.get_all_related_many_to_many_objects()
+        for relation in reverse_m2ms:
+            relation_items = getattr(src_obj, relation.get_accessor_name(), None)
+            for item in relation_items.all():
+                new_item = deepcopy(item)
+                new_item.id = None
+                setattr(new_item, relation.field.name, dst_obj)
+                new_item.save()
+                self.clone_relations(item, new_item)
 
     def update_modified_at(self):
         self.publisher_modified_at = timezone.now()
