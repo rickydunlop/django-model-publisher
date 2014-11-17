@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.utils import timezone
 from django.db import models
 
@@ -67,7 +69,36 @@ class PublisherModelBase(models.Model):
         if self.publisher_modified_at > self.publisher_linked.publisher_modified_at:
             return True
 
+        # Check all related models to see if they have been modified
+        if self.check_reverse_foreign_keys_dirty(self):
+            return True
 
+        if self.check_reverse_m2m_dirty(self):
+            return True
+
+        return False
+
+    def check_reverse_foreign_keys_dirty(self, obj):
+        reverse_foreignkeys = obj._meta.get_all_related_objects()
+        for relation in reverse_foreignkeys:
+            if relation.field.rel.multiple:
+                relation_items = getattr(self, relation.get_accessor_name(), None)
+                for item in relation_items.all():
+                    tdelta = item.modified - item.created
+                    if tdelta.total_seconds() > 1:
+                        return True
+                    self.check_reverse_foreign_keys_dirty(item)
+        return False
+
+    def check_reverse_m2m_dirty(self, obj):
+        reverse_m2ms = self._meta.get_all_related_many_to_many_objects()
+        for relation in reverse_m2ms:
+            relation_items = getattr(self, relation.get_accessor_name(), None)
+            for item in relation_items.all():
+                tdelta = item.modified - item.created
+                if tdelta.total_seconds() > 1:
+                    return True
+                self.check_reverse_m2m_dirty(item)
         return False
 
     @assert_draft
