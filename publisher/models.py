@@ -85,7 +85,7 @@ class PublisherModelBase(models.Model):
                 relation_items = getattr(self, relation.get_accessor_name(), None)
                 for item in relation_items.all():
                     tdelta = item.modified - item.created
-                    if tdelta.total_seconds() > 1:
+                    if tdelta.total_seconds() > 5:
                         return True
                     self.check_reverse_foreign_keys_dirty(item)
         return False
@@ -96,7 +96,7 @@ class PublisherModelBase(models.Model):
             relation_items = getattr(self, relation.get_accessor_name(), None)
             for item in relation_items.all():
                 tdelta = item.modified - item.created
-                if tdelta.total_seconds() > 1:
+                if tdelta.total_seconds() > 5:
                     return True
                 self.check_reverse_m2m_dirty(item)
         return False
